@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:13
+    restart: always 
+    env_file: 
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  #nonvolatile data storage
+    ports:
+      - "5432:5432"
+    healthcheck:  
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy  # if db is healthy, then start api
+
+volumes:
+  postgres_data: 
