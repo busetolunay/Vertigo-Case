@@ -15,10 +15,11 @@ def get_db():
         yield db
     finally:
         db.close()
+        
 #create clan
 @app.post("/clans/", response_model=schemas.ClanResponse)
 def create_clan(clan: schemas.ClanCreate, db: Session = Depends(get_db)):
-    db_clan = models.Clan(name=clan.name, region=clan.region)
+    db_clan = models.Clan(name=clan.name, region=clan.region, created_at=clan.created_at) # assign created_at if provided
     db.add(db_clan)
     db.commit()
     db.refresh(db_clan)

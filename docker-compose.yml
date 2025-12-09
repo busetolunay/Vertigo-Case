@@ -23,7 +23,9 @@ services:
       - .env
     depends_on:
       db:
-        condition: service_healthy  # if db is healthy, then start api
+        condition: service_healthy  #wait for db to be healthy before starting api
+
 
 volumes:
-  postgres_data: 
+  postgres_data:
+

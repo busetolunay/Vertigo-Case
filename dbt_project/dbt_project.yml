@@ -1,8 +1,9 @@
-name: 'vertigo_case'
+name: 'vertigo_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'default'
+
+profile: 'vertigo_db'
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
@@ -11,5 +12,5 @@ analysis-paths: ["analyses"]
 macro-paths: ["macros"]
 
 models:
-  vertigo_case:
-    materialized: table
+  vertigo_analytics:
+    materialized: table  

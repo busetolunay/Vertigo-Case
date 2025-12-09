@@ -12,7 +12,7 @@ class ClanCreate(ClanBase): #POST
 
 class ClanResponse(ClanBase): #GET
     id: UUID
-    created_at: datetime
+    created_at:Optional[datetime] = datetime # default to now
 
-    class Config:  # to return sqlalchemy models to pydantic models
+    class Config:  # to configure Pydantic model to work with ORM objects returned by SQLAlchemy
         from_attributes = True
