@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: raw_data
+    database: vertigo-case-480811  # project ID
+    schema: vertigo_raw            # raw dataset name
+    tables:
+      - name: user_metrics

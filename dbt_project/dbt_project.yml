@@ -1,16 +1,22 @@
-name: 'vertigo_analytics'
+
+
+name: 'dbt_project'
 version: '1.0.0'
-config-version: 2
 
+# which "profile" dbt uses for this project.
+profile: 'dbt_project'
 
-profile: 'vertigo_db'
-
+# where dbt should look for different types of files.
 model-paths: ["models"]
-seed-paths: ["seeds"]
-test-paths: ["tests"]
 analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
 macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:         # directories to be removed by dbt clean
+  - "target"
+  - "dbt_packages"
 
 models:
-  vertigo_analytics:
-    materialized: table  
+  dbt_project:

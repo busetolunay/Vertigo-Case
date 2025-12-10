@@ -1,38 +1,65 @@
-/*
-    This model aggregates raw user metrics into a daily report.
-    We use safe_divide to prevent errors if DAU is zero.
-*/
+{{ config(
+    materialized='table'
+) }}
 
-WITH raw_data AS (
-    -- In a real scenario, you would replace this with the actual source table
-    SELECT * FROM {{ source('raw_data', 'user_metrics') }}
+WITH daily_stats AS (
+    SELECT
+        event_date,
+        country,
+        platform,
+        
+        -- Basic Aggregations
+        COUNT(DISTINCT user_id) as dau,
+        SUM(iap_revenue) as total_iap_revenue,
+        SUM(ad_revenue) as total_ad_revenue,
+        SUM(match_start_count) as matches_started,
+        SUM(match_end_count) as matches_ended,
+        SUM(victory_count) as victories,
+        SUM(defeat_count) as defeats,
+        SUM(server_connection_error) as server_errors
+
+    FROM {{ source('raw_data', 'user_metrics') }}
+    GROUP BY 1, 2, 3
 )
 
 SELECT
     event_date,
     country,
     platform,
+    dau,
+    total_iap_revenue,
+    total_ad_revenue,
     
-    -- DAU (Daily Active Users)
-    COUNT(DISTINCT user_id) as dau,
+    -- Calculated Metrics (Handling division by zero safely)
     
-    -- Revenue
-    SUM(iap_revenue) as total_iap_revenue,
-    SUM(ad_revenue) as total_ad_revenue,
-    
-    -- ARPDAU (Total Revenue / DAU)
-    SAFE_DIVIDE(SUM(iap_revenue + ad_revenue), COUNT(DISTINCT user_id)) as arpdau,
-    
-    -- Engagement
-    SUM(match_start_count) as matches_started,
-    SAFE_DIVIDE(SUM(match_start_count), COUNT(DISTINCT user_id)) as match_per_dau,
-    
-    -- Win/Loss Ratios
-    SAFE_DIVIDE(SUM(victory_count), SUM(match_end_count)) as win_ratio,
-    SAFE_DIVIDE(SUM(defeat_count), SUM(match_end_count)) as defeat_ratio,
-    
-    -- Technical Health
-    SAFE_DIVIDE(SUM(server_connection_error), COUNT(DISTINCT user_id)) as server_error_per_dau
+    -- ARPDAU: (IAP + Ad) / DAU
+    CASE 
+        WHEN dau > 0 THEN (total_iap_revenue + total_ad_revenue) / dau 
+        ELSE 0 
+    END as arpdau,
 
-FROM raw_data
-GROUP BY 1, 2, 3
+    -- Matches per DAU
+    CASE 
+        WHEN dau > 0 THEN matches_started / dau 
+        ELSE 0 
+    END as match_per_dau,
+
+    -- Win Ratio: Victories / Matches Ended
+    CASE 
+        WHEN matches_ended > 0 THEN victories / matches_ended 
+        ELSE 0 
+    END as win_ratio,
+
+    -- Defeat Ratio
+    CASE 
+        WHEN matches_ended > 0 THEN defeats / matches_ended 
+        ELSE 0 
+    END as defeat_ratio,
+
+    -- Server Error per DAU
+    CASE 
+        WHEN dau > 0 THEN server_errors / dau 
+        ELSE 0 
+    END as server_error_per_dau
+
+FROM daily_stats
