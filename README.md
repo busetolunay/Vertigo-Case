@@ -50,6 +50,9 @@ Deployment: Utilized Google Cloud Run for a serverless approach.1 This allows th
 
 Networking: The API connects to the database via Public IP (with authorized networks) for this case study to simplify VPC configurations.
 
+<img width="480" height="214" alt="Ekran Görüntüsü (1998)" src="https://github.com/user-attachments/assets/8e408c60-3ddb-4a89-b696-b73d29a15019" />
+
+
 Part 2: Analytics Pipeline (ELT)
 
 Ingestion Strategy: instead of uploading 16+ compressed files individually, I utilized Google Cloud Storage (GCS) as a data lake staging area. This allows for bulk loading into BigQuery using paths (*.csv.gz).
@@ -58,6 +61,10 @@ Data Warehouse: BigQuery was selected for its ability to handle large datasets a
 
 Transformation (dbt): Used dbt (data build tool) to manage SQL logic.
 Logic: The daily_metrics model aggregates raw logs by date, country, and platform.
+
+<img width="400" height="300" alt="Screenshot 2025-12-11 182623" src="https://github.com/user-attachments/assets/71d1b68d-86f9-46d9-8868-11e9fda1c2f8" />
+
+
 
 ## 📦 Installation & Usage
 Follow these steps to deploy the project to Google Cloud Platform.
